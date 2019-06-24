@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import api from '../services/api';
 
-import { View, Text } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity } from 'react-native';
 
 export default class Main extends Component {
     static navigationOptions = {
@@ -34,15 +34,26 @@ export default class Main extends Component {
         }
     }
 
+    renderItem = ({ item }) => (
+        <View>
+            <Text>{item.title}</Text>
+            <Text>{item.description}</Text>
+            <TouchableOpacity onPress={() => {}}>
+                <Text>Acessar</Text>
+            </TouchableOpacity>
+        </View>
+    );
+
     render() {
         const { docs } = this.state;
 
         return (
             <View>
-                <Text>Página Main: </Text>
-                {docs.map(product => (
-                    <Text key={product._id}>{product.title}</Text>
-                ))}
+                <FlatList 
+                    data={docs}
+                    keyExtractor={item => item._id}
+                    renderItem={this.renderItem}
+                ></FlatList>
             </View>
         );
     }
