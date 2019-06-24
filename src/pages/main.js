@@ -12,7 +12,9 @@ export default class Main extends Component {
         super();
 
         this.state = {
+            productInfo: {},
             docs: [],
+            page: 1,
         };
     }
 
@@ -20,19 +22,35 @@ export default class Main extends Component {
         this.loadProducts();
     }
 
-    loadProducts = async () => {
+    loadProducts = async (page = 1) => {
         try {
-            const response = await api.get('/products');
+            const response = await api.get(`/products?page=${page}`);
         
-            const { docs } = response.data;
+            const { docs, ...productInfo } = response.data;
 
             this.setState({
-                docs
+                docs: [...this.state.docs, ...docs], 
+                productInfo,
+                page
             });
         } catch (error) {
             return error;
         }
     }
+
+    loadMore = () => {
+        try {
+            const { page, productInfo } = this.state;
+
+            if (page === productInfo.pages) return;
+    
+            const pageNumber = page + 1;
+    
+            this.loadProducts(pageNumber);
+        } catch (error) {
+            return error;
+        }
+    };
 
     renderItem = ({ item }) => (
         <View style={styles.productContainer}>
@@ -54,6 +72,8 @@ export default class Main extends Component {
                     data={docs}
                     keyExtractor={item => item._id}
                     renderItem={this.renderItem}
+                    onEndReached={this.loadMore}
+                    onEndReachedThreshold={0.1}
                 ></FlatList>
             </View>
         );
